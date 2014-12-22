@@ -1,0 +1,22 @@
+{
+  "name": "avd",
+  "version": "0.0.0",
+  "description": "another virtual dom",
+  "dependencies": {
+    "coffee-script": "1.7.1"
+  },
+  "devDependencies": {
+    "gulp": "~3.8.8",
+    "gulp-util": "~3.0.1",
+    "gulp-rimraf": "~0.1.0",
+    "gulp-rename": "~1.2.0",
+    "gulp-coffee": "~2.2.0",
+    "gulp-mocha": "~1.1.0",
+    "run-sequence": "~0.3.6",
+    "gulp-closure-compiler": "~0.2.4",
+    "gulp-copy": "0.0.2"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+}
