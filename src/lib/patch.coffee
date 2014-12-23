@@ -66,17 +66,50 @@ do (require=require, exports=exports, module=module) ->
     a = textInput( -> getAttrValue(model, attr))
     a.on('change', -> setAttrValue(model, a.value))
 
-  duplex = (path) -> (vdom) -> (model) ->
+  duplex = (path) -> (model) -> (vdom) ->
     vdom.on('getValue', -> getAttrValue(model, attr))
     vdom.on('change', -> setAttrValue(model, a.value))
 
-  lane = (path) -> (vdom) -> (model) ->
+  lane = (path) -> (model) -> (vdom) ->
     vdom.on('getValue', -> getAttrValue(model, attr))
 
-  add = (x, y) -> (vdom) -> (model) ->
+  add = (x, y) -> (model) -> (vdom) ->
     vdom.on 'value', -> x.value + y.value
     vdom.on 'change', -> throw new Error 'can not change the value of add by binding'
 
   class Property
     constructor: (@key, @_value) ->
+
+  constant = (v) -> (model) -> (vdom) ->
+    Object.defineProperty vdom, 'value',
+      get: -> v
+      set: (v) -> vdom.v = v
+
+  tag = (name, props, children) ->
+
+  input(classId, props) -> tag('input', props, children)
+
+  input.text = (classId, props) ->
+
+  d = textInput(constant(1))
+
+  d.value
+  d.value = 3
+
+  t = textInput(fn())
+  d = t()
+  d.value
+  d.value = 3
+
+  t = textInput(lane('a'))
+  m = {}
+  d = t(m)
+  d.value
+  d.value = v
+
+  t = textInput(add(lane('a'), lane('b')))
+  m = {a:1, b:2}
+  d = t(m)
+  d.value
+  d.value = 3
 

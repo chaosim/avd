@@ -4,8 +4,7 @@ do (require=require, exports=exports, module=module) ->
     {a, b} = require '../vars'
     {list, text, add, p} = require '../vdom/vdom'
     template = p(1)
-    vdom = template.create()
-    vdom.link({})
-    body = document.getElementsByTagName('body')[0]
+    model = {}
+    d = template(model)
     trace body
-    vdom.mount(body)
+    vdom.mount('body')
