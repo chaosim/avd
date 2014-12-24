@@ -40,5 +40,5 @@ task 'bw', (callback) -> runSequence 'build', ['watch'], callback
 task 'b', ['build']
 task 'w', ['watch']
 
-task 'default', ['build']
+task 'default', ['bw']
 

@@ -1,24 +1,30 @@
-class Constant
+parseClassId = (str) ->
+  [klasses, id] = str.split('#')
+  klasses = str.split('.')
+  [klasses, id]
+
+getModelValue = (model, path) -> model[path]
+
+setModelValue = (model, path, value) -> model[path] = value
+
+class Operand
+  constructor: -> throw new Error 'not implemented'
+  get:(model) -> throw new Error 'not implemented'
+  set: (model, value) -> throw new Error @constructor.name+' can not be set value'
+
+class Constant extends Operand
   constructor: (@value) ->
-  link: (model, proxy) ->
-    Object.defineProperty proxy, 'value'
-      get: -> value
-      set: (v) -> throw new Error 'constant can not be set value'
   get: (model) -> @value
-  set: (model, value) -> throw new Error 'constant can not be set value'
 
 constant = (v) -> new Constant(v)
-constant(1)
 
 class Fn
   constructor: (@fn) ->
   get: (model) -> fn()
-  set: (model, value) -> throw new Error 'fn can not be set value'
 
 class Lane
   constructor: (@path) ->
   get: (model) -> model[@path]
-  set: (model, value) -> throw new Error 'lane can not be set value'
 
 class Duplex
   constructor: (@path) ->
@@ -27,54 +33,67 @@ class Duplex
 
 add = class Add
   constructor: (@x, @y) ->
-  link: (model, proxy) ->
   get: (model) -> @x.get(model)+@y.get(model)
-  set: (model, value) ->  throw new Error 'operation can not be set value'
 
 add = (x, y) -> new Add(x, y)
 
-add(1, 2)
+class IfExpr
+  constructor: (@test, @then_, @else_) ->
+  get: (model) ->
 
 class Property
   constructor: (@key, @value) ->
-  link: (model) ->
-    (vdom) ->
+  link: (model) -> proxy(@, model)
+  create: (vdom) ->
 
 property = (key, value) -> new Property(key, value)
-
-class Tag
-  constructor: (@name, @props, @children) ->
-  link: (model) -> (com) ->
-    for p in @props
-      linkProp = p.link(model)(c)
 
 class Template
   constructor: () ->
 
-class Proxy
-  constructor: (template, model) ->
-
-# Com is COMponent
-class Com
-  constructor: (@proxy) ->
-  clone: ->
-  create: ->
-  mount: (element) ->
-  unmount: (element) ->
-  render: ->
+class Tag extends Template
+  constructor: (@name, @props, @children) ->
+  link: (model) ->
+    new Com(@, model)
 
 tag = (name, props, children) ->
   new Tag(name, props, children)
 
-c = new Com(proxy)
+p = (klassID, props, children) ->
+  tag('p'+'.'+klassId, props, children) ->
 
-c = com(tag(model), element)
+class IfElement extends Template
+  constructor: (@test, @then_, @else_) ->
+  link: (model) ->
 
-proxy = tag.link(model)
+# Com is COMponent
+class Com
+  constructor: (@template, @model, @mountElement) ->
+    @creater = -> console.log '<p>hello dc </p>'
+    @patcher = -> console.log 'patching'
+    if @mountElement then @create()
 
-c.mount(element)
+  create: ->
+    @element = @creater()
 
-constant = (v) -> (model) -> (vdom) ->
-  Object.defineProperty vdom, 'value',
-    get: -> v
-    set: (v) -> vdom.v = v
+  mount: (element) ->
+    element.appendChild(@create())
+    @mountElement = element
+
+  unmount: ->
+    @mountElement.removeChild(@element)
+
+  render: ->  @patcher()
+
+com = (template, model, element) ->
+  new Com(template, model, element)
+
+class Element
+  appendChild: ->
+  removeChild: ->
+  change: ->
+
+model = {}
+c = com(tag('p'), model, new Element())
+c.render()
+c.unmount()
