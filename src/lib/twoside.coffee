@@ -1,42 +1,37 @@
-### modules/twoside
-# make modules can be used on both server side and client side.
+### twoside
+make modules can be used on both server side and client side.
 ###
 do ->
   oldrequire = window.require
   oldexports = window.exports
   oldmodule = window.module
+
   getStackTrace = ->
     obj = {}
     Error.captureStackTrace(obj, getStackTrace)
     obj.stack
+
   twoside = window.twoside = (path) ->
     window.require = oldrequire
     window.exports = oldexports
     window.module = oldmodule
-    nwRequire = window.nwRequire
+
     path = normalize(path)
     exports  = {}
     module = twoside._modules[path] = {exports:exports}
     modulePath =  path.slice(0, path.lastIndexOf("/")+1)
     require = (path) ->
-      windowRequire = ->
-        module  = twoside._modules[path]
-        if module then return module.exports
-        path = normalize(modulePath+path)
-        module = twoside._modules[path]
-        if !module
-          console.log(getStackTrace())
-          window.require = oldrequire
-          window.exports = oldexports
-          window.module = oldmodule
-          if window.nwRequire
-            global.require = window.nwRequire
-          throw path+' is a wrong twoside module path.'
-        module.exports
-      if not nwRequire then windowRequire(path)
-      else
-        try nwRequire(path)
-        catch e then windowRequire(path)
+      module  = twoside._modules[path]
+      if module then return module.exports
+      path = normalize(modulePath+path)
+      module = twoside._modules[path]
+      if !module
+        console.log(getStackTrace())
+        window.require = oldrequire
+        window.exports = oldexports
+        window.module = oldmodule
+        throw path+' is a wrong twoside module path.'
+      module.exports
     {require:require, exports:exports, module:module}
   twoside._modules = {}
   ### we can alias some external modules.###

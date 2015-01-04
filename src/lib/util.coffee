@@ -1,5 +1,11 @@
-if typeof window == 'object' then {require, exports, module} = twoside('/dc/util')
+if typeof window == 'object' and typeof twoside == 'function'
+  {require, exports, module} = twoside('/dcom/util')
+
 do (require = require, exports = exports, module = module) ->
+
+  if typeof exports != 'object'
+    dcom = window.dcom or {}
+    exports = dcom
 
   exports.extend = (target) ->
     i = 1;
